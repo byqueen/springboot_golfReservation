@@ -1,0 +1,39 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>the Premium Golf</title>
+    <link rel="stylesheet" href="/css/main.css"> <!-- 여기에 위의 CSS 파일을 연결하세요 -->
+</head>
+
+<body>
+<!-- 헤더 -->
+<header>
+<div class="container">
+
+<h1>the Premium Golf</h1>
+
+<nav>
+<a href="/index">홈</a>
+<span sec:authorize="!isAuthenticated()"><a href="/member/form">로그인</a></span>
+<span sec:authorize="isAuthenticated()"><a href="/member/logout">로그아웃</a></span>
+
+<span sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')">
+	<a href="/member/list">회원관리</a> <!-- admin, manager -->
+	<a href="/golf/list">공공데이터</a> <!-- 'admin', manager -->
+	<a href="/golf/product/list">상품관리</a> <!-- admin, manager -->
+	<a href="/golf/course/list">코스관리</a> <!-- all -->
+	<a href="/golf/reserve/listAll">예약관리</a> <!-- all -->
+</span>
+
+<span sec:authorize="hasAnyRole('ROLE_VIP', 'ROLE_MEMBER', 'ROLE_GUEST')">
+	<a href="/golf/index">전국골프장</a> <!-- all -->
+	<a href="/golf/course/list">골프장예약</a> <!-- all -->
+	<a href="/golf/cart/edit">장바구니</a> <!-- all -->
+	<a href="/golf/reserve/list">주문내역</a> <!-- all -->
+</span>
+</nav>
+
+</div>
+</header>

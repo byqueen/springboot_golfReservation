@@ -1,0 +1,157 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<block th:replace="~{include/top}"></block>
+	<link type="text/css" rel="stylesheet" href="/css/list.css" />
+	<link type="text/css" rel="stylesheet" href="/css/input.css" />
+</head>
+
+<section class="main">
+
+
+<div style="width: 500px; margin: auto;">
+    <h2 style="text-align: center;">
+        [[${m.golfcourseNm}]]의 ❛[[${m.courseNm}]] [[${m.courseHole}]]홀❜ 코스
+    </h2>
+</div>
+
+<form name="f1" id="f1" action="/golf/cart/insert" method="post">
+<input type="hidden" id="gno" name="gno" th:value="${m.gno}" />
+<input type="hidden" id="cno" name="cno" th:value="${m.cno}" />
+
+<table class="type09" style="width:500px;">
+	<tr><td colspan="2">
+		<div id="buttonContainer" style="margin:10px;">
+			&emsp;&emsp;&emsp;코스보기
+		    <button type="button" onclick="showImage(0)">1</button>
+		    <button type="button" onclick="showImage(1)">2</button>
+		    <button type="button" onclick="showImage(2)">3</button>
+		    <button type="button" onclick="showImage(3)">4</button>
+		    <button type="button" onclick="showImage(4)">5</button>
+		    <button type="button" onclick="showImage(5)">6</button>
+		    <button type="button" onclick="showImage(6)">7</button>
+		    <button type="button" onclick="showImage(7)">8</button>
+		    <button type="button" onclick="showImage(8)">9</button>
+		</div>
+		<div id="imageContainer" style="display: flex;justify-content:center;align-items:center;flex-direction: column;">
+		    <img th:each="img, iterStat : ${imgs}"
+		         th:if="${iterStat.index == 0}"
+		         th:src="@{/files/golf/course/}+${img.courseImgStr}"
+		         style="width:300px;height:auto;" />
+		    <img th:each="img, iterStat : ${imgs}"
+		         th:if="${iterStat.index == 1}"
+		         th:src="@{/files/golf/course/}+${img.courseImgStr}"
+		         style="width:300px;height:auto;" />
+		    <img th:each="img, iterStat : ${imgs}"
+		         th:if="${iterStat.index == 2}"
+		         th:src="@{/files/golf/course/}+${img.courseImgStr}"
+		         style="width:300px;height:auto;" />
+		    <img th:each="img, iterStat : ${imgs}"
+		         th:if="${iterStat.index == 3}"
+		         th:src="@{/files/golf/course/}+${img.courseImgStr}"
+		         style="width:300px;height:auto;" />
+		    <img th:each="img, iterStat : ${imgs}"
+		         th:if="${iterStat.index == 4}"
+		         th:src="@{/files/golf/course/}+${img.courseImgStr}"
+		         style="width:300px;height:auto;" />
+		    <img th:each="img, iterStat : ${imgs}"
+		         th:if="${iterStat.index == 5}"
+		         th:src="@{/files/golf/course/}+${img.courseImgStr}"
+		         style="width:300px;height:auto;" />
+		    <img th:each="img, iterStat : ${imgs}"
+		         th:if="${iterStat.index == 6}"
+		         th:src="@{/files/golf/course/}+${img.courseImgStr}"
+		         style="width:300px;height:auto;" />
+		    <img th:each="img, iterStat : ${imgs}"
+		         th:if="${iterStat.index == 7}"
+		         th:src="@{/files/golf/course/}+${img.courseImgStr}"
+		         style="width:300px;height:auto;" />
+		    <img th:each="img, iterStat : ${imgs}"
+		         th:if="${iterStat.index == 8}"
+		         th:src="@{/files/golf/course/}+${img.courseImgStr}"
+		         style="width:300px;height:auto;" />
+		</div><br />
+		</td></tr>
+	<tr><th scope="cols" style="width:25%;">골프장명</th>
+		<td th:text="'['+${m.usertype}+'] '+${m.golfcourseNm} +' / 총 '+${m.holeNo}+'홀'" style="width:200px;"></td></tr>
+	<tr><th scope="cols">주소</th>
+		<td th:text="'['+${m.region}+'] '+${m.glocation}"></td></tr>
+	<tr><th scope="cols">주문수량</th>
+		<td><input type="number" id="amount" name="amount"  
+				   value="1" min="1" max="5" style="width:30%;" /></td></tr>
+	<tr><th scope="cols">예약인원</th>
+		<td><select id="rpeople" name="rpeople" style="width:30%;">
+				<option value="2">2인</option>
+				<option value="3">3인</option>
+				<option value="4">4인</option>
+			</select>
+		</td></tr>	
+</table>
+
+<div style="display:flex;justify-content:center;margin:20px;">
+<input type="submit" id="sub" value="예약하기" />
+</div>
+</form>
+
+<br />	
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#sub').click(function() {
+        var data = {
+            cno: $('#cno').val(),
+            gno: $('#gno').val(),
+            amount:$('#amount').val(),
+           	rpeople: $('#rpeople').val()
+        };
+
+        $.ajax({
+            url: '/golf/cart/insert',
+            type: 'POST',
+            data: data, // jQuery가 자동으로 'application/x-www-form-urlencoded'로 변환
+            dataType: 'json',
+            success: function(response) {
+                var alertMessage = response.alertMessage; // 서버에서 전달한 alert Message 
+                var redirectUrl = response.redirectUrl; // 서버에서 전달한 redirect URL
+
+                if (alertMessage) {
+                    alert(alertMessage); // 메시지를 표시합니다
+
+                    if (redirectUrl) {
+                    	// 리다이렉트 URL로 이동합니다
+                        window.location.href = redirectUrl;
+                    }
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error:', status, error);
+                console.error('Response:', xhr.responseText); // 응답 내용을 로그로 출력
+                alert('서버 오류가 발생했습니다.');
+            }
+        });
+    });
+});
+</script>
+<script>
+function showImage(index) {
+    // 모든 이미지를 숨깁니다.
+    var images = document.querySelectorAll('#imageContainer img');
+    images.forEach(function(img) {
+        img.style.display = 'none';
+    });
+
+    // 선택된 이미지만 표시합니다.
+    if (images[index]) {
+        images[index].style.display = 'block';
+    }
+}
+
+// 초기 상태로 첫 번째 이미지를 표시합니다.
+document.addEventListener('DOMContentLoaded', function() {
+    showImage(0);
+});
+</script>
+
+<div th:replace="~{include/bottom}"></div>

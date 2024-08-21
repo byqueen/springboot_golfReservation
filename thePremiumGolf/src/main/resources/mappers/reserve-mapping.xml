@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tinyego.reserve.ReserveDao">
+
+<select id="count"  parameterType="com.tinyego.reserve.ReserveVo"
+					resultType="int">
+	select count(*) 
+	from reserveT r join golfT g 
+	on r.gno = g.gno join memberT m
+	on r.mid = m.mid 
+	where 1=1 
+	<if test="searchkey != ''">
+		<if test="searchcondition == 'mname'">
+		and mname like #{searchkey}
+		</if>
+		<if test="searchcondition == 'mphone'">
+		and mphone like #{searchkey}
+		</if>
+		<if test="searchcondition == 'rname'">
+		and rname like #{searchkey}
+		</if>
+		<if test="searchcondition == 'rphone'">
+		and rphone like #{searchkey}
+		</if>
+		<if test="searchcondition == 'golfcourseNm'">
+		and r.golfcourseNm like #{searchkey}
+		</if>
+		<if test="searchcondition == 'courseNm'">
+		and r.courseNm like #{searchkey}
+		</if>
+    </if>
+</select>
+
+<select id="listAll"  parameterType="com.tinyego.reserve.ReserveVo"
+					  resultType="com.tinyego.reserve.ReserveVo">
+	select rno, rstatus, r.mid as mid, mname, role, reserveDate, rname, rphone, 
+		   r.gno as gno, region ,r.golfcourseNm as golfcourseNm, courseNm, courseHole, amount, 
+		   roundDate, roundTime, rpeople, reqComm, regularPrice, salePrice
+	from reserveT r join golfT g 
+	on r.gno = g.gno join memberT m
+	on r.mid = m.mid 
+	where 1=1 
+	<if test="searchkey != ''">
+		<if test="searchcondition == 'mname'">
+		and mname like #{searchkey}
+		</if>
+		<if test="searchcondition == 'mphone'">
+		and mphone like #{searchkey}
+		</if>
+		<if test="searchcondition == 'rname'">
+		and rname like #{searchkey}
+		</if>
+		<if test="searchcondition == 'rphone'">
+		and rphone like #{searchkey}
+		</if>
+		<if test="searchcondition == 'golfcourseNm'">
+		and r.golfcourseNm like #{searchkey}
+		</if>
+		<if test="searchcondition == 'courseNm'">
+		and r.courseNm like #{searchkey}
+		</if>
+    </if>
+</select>
+
+<select id="edit"  parameterType="com.tinyego.reserve.ReserveVo"
+					  resultType="com.tinyego.reserve.ReserveVo">
+	select rno, rstatus, r.mid as mid, mname, role, reserveDate, rname, rphone, 
+		   r.gno as gno, region ,r.golfcourseNm as golfcourseNm, courseNm, courseHole, amount, 
+		   roundDate, roundTime, rpeople, reqComm, regularPrice, salePrice
+	from reserveT r join golfT g 
+	on r.gno = g.gno join memberT m
+	on r.mid = m.mid 
+	where rno=#{rno}
+</select>
+
+<update id="update">
+	update reserveT 
+	set rstatus=#{rstatus} 
+	where rno=#{rno}
+</update>
+
+<select id="list">
+	select rno, rstatus, mid, reserveDate, rname, rphone, 
+		   gno, golfcourseNm, courseNm, courseHole, amount, 
+		   roundDate, roundTime, rpeople, reqComm, regularPrice, salePrice
+	from reserveT
+	where mid=#{mid}
+</select>
+
+<select id="selectOne">
+	select rno, rstatus, mid, reserveDate, rname, rphone, 
+		   gno, golfcourseNm, courseNm, courseHole, amount, 
+		   roundDate, roundTime, rpeople, reqComm, regularPrice, salePrice
+	from reserveT 
+	where mid=#{mid}
+</select>
+
+<select id="availableTimes" parameterType="com.tinyego.reserve.ReserveVo"
+							resultType="java.lang.String">
+	select ttime 
+	from timeT 
+	where ttime not in 
+	    (select roundTime reserveT 
+	    from reserveT 
+	    where golfcourseNm = #{golfcourseNm} 
+	    and courseNm = #{courseNm}
+	    and roundDate = #{selectedDate}
+	    and rstatus != '예약취소')
+	order by ttime asc 
+</select>
+
+<insert id="insert">
+	insert into reserveT (rno, mid, rname, rphone, gno, golfcourseNm, courseNm, courseHole, amount, 
+						  roundDate, roundTime, rpeople, reqComm, regularPrice, salePrice)
+	values (ridx.nextval, #{mid}, #{rname}, #{rphone}, #{gno}, #{golfcourseNm}, #{courseNm}, #{courseHole}, #{amount},  
+			#{roundDate}, #{roundTime}, #{rpeople}, #{reqComm}, #{regularPrice}, #{salePrice})
+</insert>
+
+</mapper>

@@ -1,0 +1,106 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+
+<head>
+	<block th:replace="~{include/top}"></block>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="/css/list.css" />
+	<link type="text/css" rel="stylesheet" href="/css/input.css" />
+</head>
+
+<section class="main">
+<br /><br />
+
+<span sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')">
+<div style="display:flex;justify-content:center;margin:20px;">
+<h2>공공데이터 상세</h2>
+</div>
+</span>
+<span sec:authorize="hasAnyRole('ROLE_GUEST', 'ROLE_MEMBER', 'ROLE_VIP')">
+<div style="display:flex;justify-content:center;margin:20px;">
+<h2>[[${m.golfcourseNm}]]</h2>
+</div>
+</span>
+
+<br />
+
+
+<!-- 위치정보(지도) -->
+<div id="map" style="width:600px;height:250px;margin:auto;display:block;"></div>
+
+<!-- 상세정보 -->
+<form name="f1" action="/golf/update" method="post" enctype="multipart/form-data">
+<input type="hidden" name="gno" th:value="${m.gno}" />
+<input type="hidden" name="golfcourseNm" th:value="${m.golfcourseNm}" />
+<input type="hidden" name="usertype" th:value="${m.usertype}" />
+<input type="hidden" name="holeNo" th:value="${m.holeNo}" />
+<table class="type09" style="width:600px;">
+	<tr><th scope="cols" style="width:25%;">골프장명</th>
+		<td th:text="'['+${m.usertype}+'] '+${m.golfcourseNm}"></td></tr>
+	<tr><th scope="cols">주소</th>
+		<td th:text="'['+${m.region}+'] '+${m.glocation}"></td></tr>
+	<tr><th scope="cols">홀수</th>
+		<td>[[${m.holeNo}]]</td></tr>
+	<span sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')">
+	<tr><th scope="cols">골프장사진</th>
+		<td>[[${m.golfImgStr}]]
+			<input type="file" name="golfImg" />
+		</td></tr>
+	</span>
+</table>
+
+<div style="display:flex;justify-content:center;margin:20px;">
+<span sec:authorize="hasAnyRole('ROLE_ADMIN', 'ROLE_MANAGER')">
+<input type="submit" value="수정하기" onClick="func('U')" />&nbsp;
+<input type="button" value="상품등록하기" onClick="func('I')" />&nbsp;
+</span>
+<input type="button" value="코스보기" onClick="func('C')" />
+</div>
+</form>
+
+<br />	
+</section>
+
+<script>
+function func(str) {
+	if (str == 'U') {
+		f1.action = "/golf/update";
+	} else if (str == 'I') {
+		var gno = f1.gno.value;
+		// alert(gno);
+		location.href = "/golf/product/form?gno="+gno;
+	} else if (str == 'C') {
+		var golfcourseNm = f1.golfcourseNm.value;
+		location.href = "/golf/course/list?searchcondition=golfcourseNm&searchkey="+golfcourseNm;
+	}
+} 
+</script>
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=fdd04c02ea3b2316bd88d973a73031d1&libraries=services"></script>
+<script>
+var mapContainer = document.getElementById('map'), // 지도를 표시할 div 
+    mapOption = {
+        center: new kakao.maps.LatLng(33.450701, 126.570667), // 지도의 중심좌표
+        level: 5 // 지도의 확대 레벨
+    };  
+
+var map = new kakao.maps.Map(mapContainer, mapOption); // 지도 생성 
+
+var geocoder = new kakao.maps.services.Geocoder(); // 주소-좌표 변환 객체 생성
+geocoder.addressSearch('[[${m.glocation}]]', function(result, status) { // 주소로 좌표 검색
+	
+     if (status === kakao.maps.services.Status.OK) { // 검색 완료
+        var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+        var marker = new kakao.maps.Marker({ // 마커 표시
+            map: map,
+            position: coords
+        });
+        map.setCenter(coords); // 지도 중심을 결과 좌표값으로 이동
+    } 
+});    
+</script>
+
+<div th:replace="~{include/bottom}"></div>
+
+

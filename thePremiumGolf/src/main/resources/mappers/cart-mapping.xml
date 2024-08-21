@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tinyego.cart.CartDao">
+
+<insert id="insert" parameterType="com.tinyego.cart.CartVo">
+	insert into cartT (ctno, mid, gno, cno, amount, rpeople)
+	values (ctidx.nextval, #{mid}, #{gno}, #{cno}, #{amount}, #{rpeople})
+</insert>
+
+<select id="edit" parameterType="com.tinyego.cart.CartVo"
+					 resultType="com.tinyego.cart.CartVo">
+	select ctno, m.mid as mid, mname, mphone, ct.gno as gno, ct.cno as cno, golfcourseNm, courseNm, c.courseHole as courseHole, regPrice, regPrice_wknd, amount, rpeople, ct.regdate as regdate 
+	from cartT ct join ProductT p
+	on ct.gno = p.gno join courseT c 
+	on ct.cno = c.cno join golfT g
+	on ct.gno = g.gno join memberT m
+	on ct.mid = m.mid
+	where ct.mid=#{mid}
+</select>
+
+<delete id="delete" parameterType="com.tinyego.cart.CartVo">
+	delete from cartT 
+	where ctno=#{ctno}
+</delete>
+
+</mapper>

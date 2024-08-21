@@ -1,0 +1,102 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<block th:replace="~{include/top}"></block>
+	<link type="text/css" rel="stylesheet" href="/css/list.css" />
+	<link type="text/css" rel="stylesheet" href="/css/input.css" />
+	<link type="text/css" rel="stylesheet" href="/css/page.css" />
+</head>
+
+<section class="main">
+<br />
+
+<br />
+<div th:if="${m == null}" style="width:600px;margin:180px;display:flex;justify-content:center;align-items:center;height:20vh;">
+    <h5>주문 내역이 없습니다.</h5>
+</div>
+
+<div th:if="${m != null}" style="width:600px;margin:auto;">
+<h2 align="center">
+예약 상세
+</h2><br />
+
+<form name="reserveF">
+<input type="hidden" name="rno" th:value="${m.rno}" />
+
+<table class="type09" style="width:500px;">
+	<tr><th scope="cols" style="width:25%;">예약번호</th>
+		<td>[[${m.rno}]]</td></tr>
+	<tr><th scope="cols">예약상태</th>
+		<span th:if="${m.rstatus == '예약취소'}">
+		<th scope="row">예약취소</th>
+		</span>
+		<span th:if="${m.rstatus != '예약취소'}">
+		<th scope="row">
+			<select name="rstatus">
+        		<option value="예약대기" th:selected="${m.rstatus == '예약대기'}">예약대기</option>
+        		<option value="예약확인중" th:selected="${m.rstatus == '예약확인중'}">예약확인중</option>
+        		<option value="예약확정" th:selected="${m.rstatus == '예약확정'}">예약확정</option>
+        		<option value="예약취소" th:selected="${m.rstatus == '예약취소'}">예약취소</option>
+        		<option value="라운드준비중" th:selected="${m.rstatus == '라운드준비중'}">라운드준비중</option>
+        		<option value="라운드완료" th:selected="${m.rstatus == '라운드완료'}">라운드완료</option>
+    		</select>
+    	</th>
+    	</span>
+    </tr>
+	<tr><th scope="cols">골프장명</th>
+		<td>[[${m.golfcourseNm}]]</td></tr>
+	<tr><th scope="cols">코스정보</th>
+		<td>[[${m.courseNm}]] / [[${m.courseHole}]]홀</td></tr>
+	<tr><th scope="cols">라운드정보</th>
+		<td>[[${m.roundDate}]] / [[${m.roundTime}]]시</td></tr>
+	<tr><th scope="cols">예약자정보</th>
+		<td>[[${m.rname}]]님 / 연락처 : [[${m.rphone}]]</td></tr>
+	<tr><th scope="cols">주문수량</th>
+		<td>[[${m.amount}]]</td></tr>
+	<tr><th scope="cols">예약인원</th>
+		<td>[[${m.rpeople}]]</td></tr>
+	<tr><th scope="cols">요청사항</th>
+		<td>[[${m.reqComm}]]</td></tr>
+	<tr><th scope="cols">정상요금</th>
+		<td id="regularPrice">[[${m.regularPrice}]] 원</td></tr>
+	<tr><th scope="cols">결제요금</th>
+		<td id="salePrice">[[${m.salePrice.intValue()}]] 원</td></tr>	
+</table><br />
+
+<div style="display:flex;justify-content:center;margin:20px;">
+<span th:if="${m.rstatus != '예약취소'}" >
+<input type="button" value="예약상태변경" onClick="func('U')" />&nbsp;
+</span>
+<input type="button" value="뒤로가기" onClick="func('L')" />
+</div>
+</form>
+
+</div>
+
+<br />	
+</section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function func(str) {
+	if (str == 'U') {
+		// alert("예약상태변경");
+		var rno = reserveF.rno.value;
+		var rstatus = reserveF.rstatus.value;
+		// alert(rno+": "+rstatus);
+		location.href = "/golf/reserve/update?rno="+rno+"&rstatus="+rstatus;	
+	} else if (str == 'L') {
+		// alert("목록보기");
+		location.href = "/golf/reserve/listAll"
+	}
+}
+</script>
+
+<script>
+document.getElementById('regularPrice').innerText = 
+    parseInt(document.getElementById('regularPrice').innerText.replace(' 원', '')).toLocaleString() + ' 원';
+document.getElementById('salePrice').innerText = 
+    parseInt(document.getElementById('salePrice').innerText.replace(' 원', '')).toLocaleString() + ' 원';
+</script>
+
+<div th:replace="~{include/bottom}"></div>

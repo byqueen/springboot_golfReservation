@@ -1,0 +1,98 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<block th:replace="~{include/top}"></block>
+	<link type="text/css" rel="stylesheet" href="/css/list.css" />
+	<link type="text/css" rel="stylesheet" href="/css/input.css" />
+	<link type="text/css" rel="stylesheet" href="/css/page.css" />
+</head>
+<section class="main">
+<br />
+
+<div th:if="${li == null}" style="width:800px;margin:180px;display:flex;justify-content:center;align-items:center;height:20vh;">
+    <h5>주문 내역이 없습니다.</h5>
+</div>
+
+<div th:if="${li != null}" style="width:800px;margin:auto;">
+
+<div class="search-group">
+<form action="/golf/reserve/listAll" method="get">
+<select name="searchcondition" style="width:150px;">
+	<option value="mname">회원 성명</option>
+	<option value="mphone">회원 휴대폰번호</option>
+	<option value="rname">예약자 성명</option>
+	<option value="rphone">예약자 휴대폰번호</option>
+	<option value="golfcourseNm">골프장명</option>
+	<option value="courseNm">코스명</option>
+</select>
+<input type="text" name="searchkey" placeholder="검색어를 입력하세요" />
+<input type="submit" value="검색" />
+</form>
+</div>
+<br /><br />
+
+<div id="retbody">
+<table class="type09">
+<thead>
+	<tr>
+		<th scope="cols" style="width:65px;">예약번호</th>
+		<th scope="cols" style="width:75px;">예약상태</th>
+		<th scope="cols" style="width:115px;">회원정보</th>
+		<th scope="cols" style="width:200px;">골프장&코스정보</th>
+		<th scope="cols" style="width:175px;">예약정보[인원]</th>
+		<th scope="cols" style="width:70px;">비고</th>
+	</tr>
+</thead>
+
+<tbody>
+	<tr th:each="m : ${li}">
+		<th scope="row">[[${m.rno}]]</th>
+		<td>[[${m.rstatus}]]</td>
+		<td th:text="'[' + ${#strings.replace(m.role, 'ROLE_', '')} + '] ' + ${m.mname}"></td>
+		<td><span th:text="'[' + ${m.region} + '] ' + ${m.golfcourseNm} + '_' +  ${m.courseNm} + ' ' + ${m.courseHole} + '홀'"></span></td>
+		<td><span th:text="${m.roundDate} + ' ' + ${m.roundTime} +'시'"></span><br />
+			<span th:text="${m.rname} + ' ' + ${m.rphone} + ' [' + ${m.rpeople} + '명]'"></span><br />
+		<td><a th:href="@{/golf/reserve/edit(rno=${m.rno})}" class="atext">상세보기</a></td>
+	</tr>
+</tbody>
+</table>
+</div>
+
+<!-- <h6> 
+start : [[${start}]] / currentPage : [[${currentPage}]] / <br />
+totalRecord : [[${totalRecord}]] / totalPage : [[${totalPage}]] / nextPageEnd : [[${nextPageEnd}]] / <br />
+listSize : [[${listSize}]] / listStartPage : [[${listStartPage}]] / listEndPage : [[${listEndPage}]] / <br />
+</h6> -->
+
+<div class="pagination" >
+<!-- 첫페이지 -->
+<th:block th:if="${currentPage > 1}">
+<a th:href="@{/golf/reserve/listAll(start=0,searchcondition=${searchcondition},searchkey=${searchkey})}">첫페이지</a>
+</th:block>
+<!-- 이전페이지 -->
+<th:block th:if="${listStartPage > listSize}">
+<a th:href="@{/golf/reserve/listAll(start=${prePage},searchcondition=${searchcondition},searchkey=${searchkey})}">...</a>
+</th:block>
+<!-- 숫자페이지 -->
+<th:block th:each="i : ${#numbers.sequence(listStartPage,listEndPage)}"
+          th:with="start=${(i-1) * pageSize}" 
+          th:if="${i <= totalPage}">
+<a th:href="@{/golf/reserve/listAll(start=${start},searchcondition=${searchcondition},searchkey=${searchkey})}" 
+   th:text="${i}" 
+   class="pageNo"
+   th:classappend="${i == currentPage ? 'activePage' : ''}"></a>
+</th:block>
+<!-- 다음페이지 -->
+<th:block th:if="${currentPage <= nextPageEnd}">
+<a th:href="@{/golf/reserve/listAll(start=${nextPage},searchcondition=${searchcondition},searchkey=${searchkey})}">...</a>
+</th:block>
+<!-- 마지막페이지 -->
+<th:block th:if="${totalPage != currentPage}">
+<a th:href="@{/golf/reserve/listAll(start=${lastPage},searchcondition=${searchcondition},searchkey=${searchkey})}">끝페이지</a>
+</th:block>
+</div>
+
+</div>
+
+<br />	
+</section>
+<div th:replace="~{include/bottom}"></div>

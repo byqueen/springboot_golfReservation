@@ -1,0 +1,44 @@
+/* Import font families */
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700&display=swap');
+
+/* Page Pagination Styles */
+.pagination {
+    display: flex;
+    justify-content: center; /* 가로 중앙 정렬 */
+    padding: 20px;
+}
+
+.pagination a {
+    font-weight: bold;
+    font-size: 14px;
+    color: #596164; /* 기본 글자 색상 */
+    float: left;
+    padding: 8px 5px;
+    text-decoration: none;
+    margin: 0 5px; /* 항목 간의 간격 추가 */
+    border-radius: 4px; /* 라운드 테두리 */
+}
+
+/* 활성화된 페이지 스타일 */
+.pagination a.activePage {
+    color: #bfae91; /* 기본 텍스트 색상 */
+    border: 1px solid #e2d1c3; /* 선택된 페이지에 테두리 추가 */
+    font-weight: bold; /* 텍스트 굵기 */
+    background-color: transparent; /* 배경색 없음 */
+    border: none; /* 테두리 없음 */
+}
+
+/* 활성화된 페이지 호버 효과 */
+.pagination a.activePage:hover {
+    color: #e2d1c3; /* 진한 베이지 색상 */
+    background-color: transparent; /* 배경색 없음 */
+    border: none; /* 테두리 없음 */
+}
+
+/* 일반 페이지 링크 호버 효과 */
+.pagination a:hover:not(.activePage) {
+    color: #e2d1c3; /* 호버 시 텍스트 색상 */
+    background-color: transparent; /* 배경색 없음 */
+    border: none; /* 테두리 없음 */
+}

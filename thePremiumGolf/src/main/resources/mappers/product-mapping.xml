@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tinyego.product.ProductDao">
+
+<select id="count" parameterType="com.tinyego.product.ProductVo"
+				   resultType="int">
+	select count(*) 
+	from productT p join golfT g 
+	on p.gno = g.gno 
+	where 1=1 
+	<if test="searchkey != null">
+		<if test="searchkey != ''">
+       		and golfcourseNm like #{searchkey}
+       	</if>
+	</if>
+</select>
+
+<select id="list" parameterType="com.tinyego.product.ProductVo"
+				  resultType="com.tinyego.product.ProductVo">
+	select ROWNUM, K.* from 
+		(select rownum as rnum, P.* from
+			(select pno, g.gno as gno, golfcourseNm, courseHole, regPrice, regPrice_wknd, p.regdate as regdate 
+			from productT p join golfT g 
+			on p.gno = g.gno
+			where 1=1 
+			<if test="searchkey != null">
+				and golfcourseNm like #{searchkey}
+			</if>
+			order by pno desc) P 
+		where ROWNUM <![CDATA[<=]]> #{end}) K 
+	where rnum <![CDATA[>=]]> #{start}
+</select>
+
+<select id="edit" parameterType="com.tinyego.product.ProductVo"
+				  resultType="com.tinyego.product.ProductVo">
+	select pno, g.gno as gno, golfcourseNm, usertype, region, glocation, holeNo, courseHole, regPrice, regPrice_wknd, p.regdate as regdate  
+	from productT p join golfT g 
+	on p.gno = g.gno
+	where pno=#{pno}
+</select>
+
+<update id="update" parameterType="com.tinyego.product.ProductVo">
+	update productT 
+	set courseHole=#{courseHole}, regPrice=#{regPrice}, regPrice_wknd=#{regPrice_wknd} 
+	where pno=#{pno}
+</update>
+
+<insert id="insert" parameterType="com.tinyego.product.ProductVo">
+	insert into productT(pno, gno, courseHole, regPrice, regPrice_wknd) 
+	values(pidx.nextval, #{gno}, #{courseHole}, #{regPrice}, #{regPrice_wknd}) 
+</insert>
+
+</mapper>

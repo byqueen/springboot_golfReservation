@@ -1,0 +1,92 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<block th:replace="~{include/top}"></block>
+	<link type="text/css" rel="stylesheet" href="/css/list.css" />
+	<link type="text/css" rel="stylesheet" href="/css/input.css" />
+</head>
+
+<section>
+<br />
+
+<br /><h2>상품 예약</h2><br />
+
+<form name="f1" action="/golf/reserve/insert" method="post">
+<table class="type09" style="width:500px;">
+	<tr><th scope="cols"  style="width:40%;">골프장명</th>
+		<td><select name="golfcourseNm" id="golfcourseNm" style="width:100%;">
+				<option value="">골프장을 선택하세요</option>
+				<block th:each="g :${golfcourseNms}">
+					<option th:value="${g.golfcourseNm}">[[${g.golfcourseNm}]]</option>
+				</block>
+			</select>
+		</td>
+	</tr>
+	<tr><th scope="cols">코스명</th>
+		<td><select name="courseNm" id="courseNm" style="width:100%;">
+				<block th:each="c :${courseNms}">
+					<option th:value="${c.courseNm}">[[${c.courseNm}]]</option>
+				</block>
+			</select>
+		</td>
+	</tr>
+	<tr><th scope="cols">풀홀수</th>
+		<td></td>
+	</tr>
+	<tr><th scope="cols">라운딩날짜</th>
+		<td><input type="date" id="startDate" name="startDate"></td>
+	</tr>
+	<tr><th scope="cols">라운딩시간</th>
+		<td><input type="datetime-local" id="appointment" name="appointment"></td>
+	</tr>
+</table>
+
+<div style="margin:10px;">
+<input type="submit" value="예약하기" />
+</div>
+</form>
+
+<br />	
+</section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var golfcourseSelect = document.getElementById('golfcourseNm');
+    var courseSelect = document.getElementById('courseNm');
+
+    golfcourseSelect.addEventListener('change', function() {
+        var selectedGolfCourse = this.value;
+
+        if (selectedGolfCourse) {
+            fetch('/golf/reserve/courses?golfcourseNm=' + encodeURIComponent(selectedGolfCourse))
+                .then(response => response.json())
+                .then(data => {
+                    // 기존 옵션을 제거합니다
+                    courseSelect.innerHTML = '<option value="">코스를 선택하세요</option>';
+
+                    if (data.message) {
+                        // 서버에서 받은 메시지가 있을 경우
+                        var option = document.createElement('option');
+                        option.value = "";
+                        option.textContent = data.message;
+                        courseSelect.appendChild(option);
+                    } else if (data.courseNms) {
+                        // 코스 목록이 있는 경우
+                        data.courseNms.forEach(course => {
+                            var option = document.createElement('option');
+                            option.value = course;
+                            option.textContent = course;
+                            courseSelect.appendChild(option);
+                        });
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+        } else {
+            // 골프장명이 선택되지 않았을 경우
+            courseSelect.innerHTML = '<option value="">코스를 선택하세요</option>';
+        }
+    });
+});
+</script>
+
+<div th:replace="~{include/bottom}"></div>

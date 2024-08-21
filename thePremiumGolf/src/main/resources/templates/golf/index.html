@@ -1,0 +1,94 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{include/top}"></div>
+<link type="text/css" rel="stylesheet" href="/css/list.css" />
+<link type="text/css" rel="stylesheet" href="/css/input.css" />
+
+<section class="main">
+<br />
+
+<!-- 공공데이터 DB / 전체 골프장 목록 -->
+<div style="display:flex;justify-content:center;margin:20px;">
+<h2>전국 골프장 둘러보기</h2>
+</div><br />
+
+<div id="map" style="width:800px;height:500px;margin:auto;"></div>
+
+<br />	
+</section>
+
+<script th:inline="javascript">
+var addresses = /*[[${li}]]*/ [];
+console.log("addresses : ", addresses);
+
+var addressList = addresses.map(function(item) { 
+	return {
+	    glocation: item.glocation,
+	    golfcourseNm: item.golfcourseNm,
+	    gno: item.gno
+	}
+});
+console.log("addressList : "+addressList);
+</script>
+
+<script type="text/javascript" 
+		src="//dapi.kakao.com/v2/maps/sdk.js?appkey=fdd04c02ea3b2316bd88d973a73031d1&libraries=services"></script>
+<script>
+var mapContainer = document.getElementById('map'),
+    mapOption = {
+        center: new kakao.maps.LatLng(33.450701, 126.570667), // 기본 중심좌표
+        level: 9 // 기본 확대 레벨
+    };
+
+var map = new kakao.maps.Map(mapContainer, mapOption);
+var geocoder = new kakao.maps.services.Geocoder();
+
+// 마커 이미지 정보
+var imageSrc = '/files/golf/golfTag.png', // 이미지 주소    
+    imageSize = new kakao.maps.Size(32, 35), // 이미지 크기
+    imageOption = {offset: new kakao.maps.Point(27, 69)}; // 이미지 옵션
+
+var markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+function addMarkersFromAddresses(addressList) {
+    addressList.forEach(function(item) {
+        geocoder.addressSearch(item.glocation, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+
+                var marker = new kakao.maps.Marker({ // 마커 생성
+                    position: coords, // 마커의 위치를 좌표로 설정
+                    image: markerImage // 마커 이미지 설정
+                });
+
+                var infowindow = new kakao.maps.InfoWindow({ // 인포윈도우 생성
+                    content: `
+	                        <div style="width:150px;text-align:center;padding:6px 0;">
+	                        	<div style="font-size:12px !important;">
+	                            	<a href="/golf/edit?gno=${item.gno}" style="text-decoration:none; color:black;">
+	                                	${item.golfcourseNm}
+	                            	</a>
+	                        	</div>
+	                   		</div>`,
+                    removable: true
+                });
+
+                kakao.maps.event.addListener(marker, 'click', function() { // 마커에 클릭이벤트 등록
+					infowindow.open(map, marker); // 마커 위 인포인도우 표시  
+                });
+                marker.setMap(map); // 지도에 마커 추가
+
+                if (addressList.indexOf(item) === 0) { // 지도 중심을 가장 첫 번째 마커의 위치로 이동
+                    map.setCenter(coords);
+                }
+            }
+        });
+    });
+}
+
+// 주소로부터 마커를 추가합니다
+addMarkersFromAddresses(addressList);
+</script>
+
+<div th:replace="~{include/bottom}"></div>
+</body>
+</html>

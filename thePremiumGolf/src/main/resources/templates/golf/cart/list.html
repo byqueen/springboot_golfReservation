@@ -1,0 +1,373 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<block th:replace="~{include/top}"></block>
+	<link type="text/css" rel="stylesheet" href="/css/list.css" />
+	<link type="text/css" rel="stylesheet" href="/css/input.css" />
+	<link type="text/css" rel="stylesheet" href="/css/page.css" />
+</head>
+
+<section class="main">
+<br /><br />
+
+<div th:if="${m == null}" style="width:600px;margin:180px;display:flex;justify-content:center;align-items:center;height:20vh;">
+    <h5>장바구니에 담긴 상품이 없습니다.</h5>
+</div>
+
+<div th:if="${m != null}" style="width:600px;margin:auto;">
+<h5 align="left">
+&emsp;*(1인 기준) 기본 18홀 라운딩 요금입니다.<br />
+&emsp;아래에서 라운딩하실 날짜와 시간을 선택하시면 총 요금이 계산되어 보여집니다.<br /><br />
+
+&emsp;▶ 라운딩 일시&emsp;
+<input type="date" id="selectedDate" name="selectedDate" style="margin:5px;" />
+<select id="availableTimes" name="availableTimes">
+	<option value="" placeholder="예약 가능 시간"></option>
+    <option value="" disabled selected></option>
+</select>
+</h5>
+
+<form name="cartF" method="post">
+<input type="hidden" id="mid" name="mid" th:value="${username}" />
+<input type="hidden" id="role" name="role" th:value="${role}" />
+<input type="hidden" id="mname" name="mname" th:value="${m.mname}" />
+<input type="hidden" id="mphone" name="mphone" th:value="${m.mphone}" />
+<input type="hidden" id="ctno" name="ctno" th:value="${m.ctno}" />
+<input type="hidden" id="gno" name="gno" th:value="${m.gno}" />
+<input type="hidden" id="golfcourseNm" name="golfcourseNm" th:value="${m.golfcourseNm}" />
+<input type="hidden" id="courseNm" name="courseNm" th:value="${m.courseNm}" />
+<input type="hidden" id="courseHole" name="courseHole" th:value="${m.courseHole}" />
+
+<table class="type09" style="width:500px;margin-right:100px;">
+	<tr><th scope="cols" style="width:25%;">번호</th><td>[[${m.ctno}]]</td></tr>
+	<tr><th scope="cols">골프장명</th><th scope="row">[[${m.golfcourseNm}]]</th></tr>
+	<tr><th scope="cols">코스정보</th><td>[[${m.courseNm}]] / [[${m.courseHole}]]홀</td></tr>
+	<tr><th scope="cols">주문수량</th>
+		<td><input type="number" id="amount" name="amount" 
+				   th:value="${m.amount}" min="1" max="5" style="width:25%;" /></td></tr>
+	<tr><th scope="cols">예약인원</th>
+		<td><select id="rpeople" name="rpeople" style="width:25%;">
+			    <option value="2" th:selected="${m.rpeople == 2}">2인</option>
+			    <option value="3" th:selected="${m.rpeople == 3}">3인</option>
+			    <option value="4" th:selected="${m.rpeople == 4}">4인</option>
+			</select></td></tr>
+	<tr><th scope="cols">정상요금</th>
+		<td class="regPrice" id="regPrice" 
+			th:text="${'[평일] ' + #numbers.formatInteger(m.regPrice, 3, 'COMMA') + ' 원 / 1인'}"></td>	
+		<td class="regPriceWknd" id="regPriceWknd" 
+			th:text="${'[주말] ' + #numbers.formatInteger(m.regPrice_wknd, 3, 'COMMA') + ' 원 / 1인'}" style="display:none;"></td></tr>
+</table><br />
+
+<h5 id="totalPrice" style="display:none;margin:5;">0 원</h5>
+<h5 id="salePrice" style="display:none;margin:5;">0 원</h5>
+<br />
+
+<div class="container">
+    <div class="form-row" style="margin-bottom:15px;">
+        <h5>▶ 예약자 정보</h5>
+    </div>
+    <div class="form-row" style="margin-right:50px;">
+        <input type="text" id="rname" name="rname" placeholder="예약자 성함" style="width: 100px;" />
+        <input type="text" id="rphone" name="rphone" 
+               onkeyup="separatePhoneNo(this.id)" maxlength="13" 
+               placeholder="예약자 휴대폰번호" style="width: 135px;" />
+    </div>
+    <div class="form-row">
+        <textarea id="reqComm" name="reqComm" placeholder="요청사항"></textarea>
+    </div>
+</div>
+
+<div style="display:flex;justify-content:center;margin:15px 0 20px 0;">
+<input type="button" value="결제하기" th:onClick="funcKgIniPay()" />&nbsp;
+<!-- <input type="submit" value="예약하기" th:onClick="funcIn()" /> -->
+<input type="button" value="삭제하기" th:onClick="funcDel()" />
+</div>
+</form>
+
+</div>
+
+<br />	
+</section>
+
+<style>
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 10px;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px; /* 각 행 사이의 여백을 줄임 */
+}
+
+.form-row input {
+    margin-right: 5px; /* input 요소들 사이의 여백을 줄임 */
+}
+
+.form-row textarea {
+    width: 500px;
+    margin-top: 0;
+}
+
+.form-row:last-child {
+    margin-bottom: 0; /* 마지막 행의 여백 제거 */
+}
+
+h5 {
+    margin: 0;
+}
+</style>
+
+<script src="https://cdn.iamport.kr/v1/iamport.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+function funcKgIniPay() {
+	// alert("funcKgIniPay")
+	var ctno = $('#ctno').val(); // 장바구니번호
+	var mid = $('#mid').val(); // 회원아이디
+	var rname = $('#rname').val(); // 예약자명
+	if (rname == "") {
+		var rname = $('#mname').val(); // 회원명
+	}
+	var rphone = $('#rphone').val(); // 예약자 휴대폰번호
+	if (rphone == "") {
+		var rphone = $('#mphone').val(); // 회원 휴대폰번호
+	}
+	// alert("rname : " +rname); 
+	var rpeople = $('#rpeople').val(); // 예약 인원
+	var reqComm = $('#reqComm').val(); // 요청사항
+	var gno = $('#gno').val(); // 골프장번호
+	var golfcourseNm = $('#golfcourseNm').val(); // 골프장명
+	var courseNm = $('#courseNm').val(); // 코스명
+	var courseHole = $('#courseHole').val(); // 코스홀수
+	var amount = $('#amount').val(); // 주문수량
+	var roundDate = $('#selectedDate').val(); // 라운딩 날짜
+	var roundTime = $('#availableTimes').val(); // 라운딩 시각
+    var regularPrice = $('#totalPrice').text().replace(/[^0-9]/g, ''); // 정상요금
+    var salePrice = $('#salePrice').text().replace(/[^0-9.]/g, ''); // 할인요금(결제요금)
+    
+	// kg이니시스 결제 API
+	var IMP = window.IMP; // 생략가능
+	IMP.init('imp77027061'); // 가맹점 식별코드
+
+	// IMP.request_pay(param, callback) 결제창 호출
+	IMP.request_pay({
+		pg: "html5_inicis",
+		pay_method: "card",
+		merchant_uid: "gpay_" + new Date().getTime(), //  주문번호
+		name: "theGolfPremium",
+		amount: salePrice, // 숫자 타입
+		buyer_email: "lookinghhh@gmail.com", // 회원 이메일
+		buyer_name: rphone, // 회원명
+		buyer_tel: rphone // 회원 연락처
+	}, function (rsp) { // callback
+		console.log(rsp);
+		if (rsp.success) { // 결제 성공시
+			var msg = '결제가 완료되었습니다.';
+			var result = {
+				"paynum": rsp.merchant_uid, // 주문번호
+	            "mid": mid, // 회원아이디
+	            "paymethod": rsp.pay_method, // 결제수단
+	            "payprice": rsp.amount, // 결제금액
+	            "paydate": new Date().toISOString().slice(0, 10), // 결제일
+	            "payproduct": golfcourseNm + "_" + courseNm, // 골프장명_코스명
+	            "paycompany": rsp.name, // 사이트명
+				
+	            "ctno": ctno, // 장바구니번호
+	            "rname": rname, // 예약자명
+	            "rphone": rphone, // 예약자 휴대폰번호
+	            "rpeople": rpeople, // 예약 인원
+	            "reqComm": reqComm, // 요청사항
+	            "gno": gno, // 골프장 번호
+	            "golfcourseNm": golfcourseNm, // 골프장명
+	            "courseNm": courseNm, // 코스명
+	            "courseHole": courseHole, // 코스홀수
+	            "amount": amount, // 주문수량
+	            "roundDate": roundDate, // 라운딩 날짜
+	            "roundTime": roundTime, // 라운딩 시각
+	            "regularPrice": regularPrice, // 정상요금
+	            "salePrice": salePrice // 결제요금
+			}
+			console.log(result);
+
+			$.ajax({
+				url: '/portone/insert',
+	            type: 'POST',
+	            contentType: 'application/json',
+	            data:JSON.stringify(result),
+	            success: function (res) {
+	               console.log(res);
+	               location.href = res;
+	            },
+	            error: function (err) {
+	               console.log(err);
+	            }
+			});
+		} else {
+			var msg = '결제 실패';
+			msg += '\n에러내용 : ' + rsp.error_msg;
+		}
+		alert(msg);
+	});
+}
+
+function funcIn() {
+	alert("insertTest");
+	var selectedDate = $('#selectedDate').val();
+    var totalPrice = $('#totalPrice').text().replace(/[^0-9]/g, ''); // 숫자만 추출
+    var salePrice = $('#salePrice').text().replace(/[^0-9]/g, '');
+	cartF.action = "/golf/reserve/insert?selectedDate="+selectedDate+"&totalPrice="+totalPrice+"&salePrice="+salePrice;
+} 
+
+function funcDel() {
+	var ctno = cartF.ctno.value;
+	alert(ctno);
+	location.href = "/golf/cart/delete?ctno="+ctno;
+}
+
+/* 휴대전화 번호 양식 */
+function separatePhoneNo(id) {
+  let input = document.getElementById(id);
+  let inputValue = input.value;
+
+  inputValue = inputValue.replace(/[^0-9]/g, ''); // 숫자가 아닌 문자 제거
+  if (inputValue.length > 3 && inputValue.charAt(3) !== '-') { // 올바른 위치에 대시 추가
+    inputValue = inputValue.slice(0, 3) + '-' + inputValue.slice(3);
+  }
+  if (inputValue.length > 8 && inputValue.charAt(8) !== '-') {
+    inputValue = inputValue.slice(0, 8) + '-' + inputValue.slice(8);
+  }
+  input.value = inputValue; // 입력값 업데이트
+}
+</script>
+<script>
+$(document).ready(function() {
+	
+    function getSelectedValue() { // 현재 선택된 예약인원 value 가져오기
+        var selectedValue = $('#rpeople').val();
+        console.log('선택된 값:', selectedValue);
+    }
+    getSelectedValue();	// 페이지 로드 시 또는 특정 이벤트 발생 시 호출
+    $('#rpeople').change(function() { // 값이 변경될 때 호출
+        getSelectedValue();
+    });
+	
+    function extractPrice(text) {
+        var priceText = text.split('원')[0].trim();
+        return parseInt(priceText.replace(/[^0-9]/g, '')) || 0;
+    }	
+	
+    function totalPayment() {
+    	console.log('totalPayment function called'); // 디버깅용 로그 추가
+    	var role = $('#role').val();
+    	
+        var amount = parseInt($('#amount').val()) || 1;
+        var rpeople = parseInt($('#rpeople').val()) || 2;
+        
+        var regPriceText = $('#regPrice').text();
+        var regPriceWkndText = $('#regPriceWknd').text();
+        var regPrice = extractPrice(regPriceText);
+        var regPriceWknd = extractPrice(regPriceWkndText);
+        
+        var isWeekend = $('#regPriceWknd').is(':visible');
+        var pricePerPerson = isWeekend ? regPriceWknd : regPrice;
+        
+        var totalPay = amount * rpeople * pricePerPerson;
+        var salePay;
+        
+     	// 할인율 적용
+        switch (role) {
+            case 'GUEST':
+                salePay = Math.floor(totalPay * 0.9);
+                break;
+            case 'MEMBER':
+                salePay = Math.floor(totalPay * 0.8);
+                break;
+            case 'MANAGER':
+            case 'ADMIN':
+                salePay = Math.floor(totalPay * 0.75);
+                break;
+            default:
+                salePay = Math.floor(totalPay); // 기본 할인 없음
+                break;
+        }
+         
+        if (totalPay > 0) {
+            $('#totalPrice').text('총 요금 : ' + totalPay.toLocaleString() + ' 원').show();
+            $('#salePrice').text('결제하실 금액 : ' + salePay.toLocaleString() + ' 원').show();
+        } else {
+            $('#totalPrice').hide();
+            $('#salePrice').hide();
+        }
+    }
+
+    function updatePriceAndShow() {
+        var selectedDate = $("#selectedDate").val();
+        var golfcourseNm = $('#golfcourseNm').val();
+        var courseNm = $('#courseNm').val();
+        
+        $.ajax({
+            url: '/golf/cart/holiday',
+            type: 'GET',
+            data: { selectedDate: selectedDate },
+            success: function(isWeekendOrHoliday) {
+                if (isWeekendOrHoliday) {
+                    $(".regPrice").hide();
+                    $(".regPriceWknd").show();
+                } else {
+                    $(".regPriceWknd").hide();
+                    $(".regPrice").show();
+                }
+                totalPayment(); // 가격 갱신 후 결제 금액 업데이트
+                $('#totalPrice').show(); // 결제 금액 표시
+            },
+            error: function(xhr, status, error) {
+                console.error('Error details:', status, error);
+                alert('서버 오류가 발생했습니다.');
+            }
+        });
+
+        $.ajax({
+            url: '/golf/cart/availableTimes',
+            type: 'GET',
+            data: { 
+                selectedDate: selectedDate,
+                golfcourseNm: golfcourseNm,
+                courseNm: courseNm
+            },
+            success: function(times) {
+                var $timeSelect = $('#availableTimes');
+                $timeSelect.empty();
+                $timeSelect.append($('<option>', {
+                    value: '',
+                    disabled: true,
+                    selected: true,
+                    text: '예약 가능 시간'
+                }));
+                $.each(times, function(index, time) {
+                    $timeSelect.append($('<option>', {
+                        value: time,
+                        text: time
+                    }));
+                });
+            },
+            error: function(xhr, status, error) {
+                console.error('Error details:', status, error);
+                alert('서버 오류가 발생했습니다.');
+            }
+        });
+    }
+
+    $("#selectedDate").change(updatePriceAndShow);
+    $('#amount, #rpeople').change(totalPayment);
+
+    // 페이지 로드시 결제 금액 숨기기
+    $('#totalPrice').hide();
+    $('#salePrice').hide();
+});
+</script>
+
+<div th:replace="~{include/bottom}"></div>

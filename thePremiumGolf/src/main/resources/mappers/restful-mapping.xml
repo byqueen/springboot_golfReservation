@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tinyego.restful.RestfulDao">
+
+<insert id="insert" parameterType="com.tinyego.golf.GolfVo">
+	insert into golfT(gno, golfcourseNm, usertype, region, glocation, gown, totalarea, holeNo) 
+	values(gidx.nextval, #{golfcourseNm}, #{usertype}, 
+		   #{region}, #{glocation}, #{gown}, #{totalarea}, #{holeNo}) 
+</insert>
+
+</mapper>
+
+
+

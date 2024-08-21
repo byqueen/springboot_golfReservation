@@ -1,0 +1,27 @@
+<html xmlns:th="http://www.thymeleaf.org"></html>
+<div th:replace="~{include/top}"></div>
+<link type="text/css" rel="stylesheet" href="/css/list.css" />
+<link type="text/css" rel="stylesheet" href="/css/input.css" />
+
+<section class="main">
+<br />
+
+<!-- 메인 콘텐츠 -->
+<block th:each="m :${li}">
+<section class="main-card container">
+    <div class="card">
+        <img th:src="@{'/files/golf/main/' + ${m.golfImgStr}}" alt="">
+        <h3><a th:href="@{/golf/edit(gno=${m.gno})}" style="text-decoration:none;color:#333;">
+        	[[${m.region}]] [[${m.golfcourseNm}]]
+        	</a></h3>
+        <p></p>
+    </div>
+</section>
+</block>
+
+<br />	
+</section>
+
+<div th:replace="~{include/bottom}"></div>
+</body>
+</html>

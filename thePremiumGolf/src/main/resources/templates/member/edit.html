@@ -1,0 +1,153 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<block th:replace="~{include/top}"></block>
+	<link type="text/css" rel="stylesheet" href="/css/list.css" />
+	<link type="text/css" rel="stylesheet" href="/css/input.css" />
+</head>
+
+<section class="main">
+
+<div style="display:flex;justify-content:center;margin:20px">
+<h2>회원정보 상세</h2>
+</div>
+
+<form action="/member/update" method="post">
+<input type="hidden" name="mno" th:value="${m.mno}" />
+<table class="type09" style="width:600px;">
+	<tr><th scope="cols" style="width:25%;">가입일자</th>
+		<td>[[${m.joindate.substring(0,10)}]]</td></tr>
+	<tr><th scope="cols">회원번호</th>
+		<th scope="row">[[${m.mno}]]</th></tr>
+	<tr><th scope="cols">아이디</th>
+		<th scope="row">[[${m.mid}]]</th></tr>
+	<tr><th scope="cols">비밀번호</th>
+		<td><input type="password" name="mpwd" th:value="${m.mpwd}" /></td></tr>
+	<tr><th scope="cols">성명</th>
+		<td><input type="text" name="mname" th:value="${m.mname}" /></td></tr>
+	<tr><th scope="cols">생년월일</th>
+		<td><input type="text" id="mbirth" name="mbirth"
+				   onkeyup="separateBirthdate(this.id)" maxlength="10" 
+				   th:value="${m.mbirth}" /></td></tr>
+	<tr><th scope="cols">휴대폰번호</th>
+		<td><input type="text" id="mphone" name="mphone" 
+				   onkeyup="separatePhoneNo(this.id)" maxlength="13" 
+				   th:value="${m.mphone}" /></td></tr>
+	<tr><th scope="cols">주소</th>
+		<td><input type="text" name="maddr" id="address" th:value="${m.maddr}" 
+				   placeholder="주소 검색 후 상세 주소를 입력해주세요." style="width:71%;">&nbsp;
+			<input type="button" onclick="execDaumPostcode()" value="주소 검색" ><br />
+			<div id="map" style="width:370px;height:300px;margin-top:10px;display:none"></div></td></tr>
+	<tr><th scope="cols">회원등급</th>
+		<td><select name="role">
+        		<option value="ROLE_ADMIN" th:selected="${m.role == 'ROLE_ADMIN'}">admin</option>
+        		<option value="ROLE_MANAGER" th:selected="${m.role == 'ROLE_MANAGER'}">manager</option>
+        		<option value="ROLE_VIP" th:selected="${m.role == 'ROLE_VIP'}">vip</option>
+        		<option value="ROLE_MEMBER" th:selected="${m.role == 'ROLE_MEMBER'}">member</option>
+        		<option value="ROLE_GUEST" th:selected="${m.role == 'ROLE_GUEST'}">guest</option>
+    	</select>
+		</td></tr>
+	<tr><th scope="cols">메모</th>
+		<td><textarea name="mmemo">[[${m.mmemo}]]</textarea></td></tr>
+</table>
+
+<div style="display:flex;justify-content:center;margin:20px;">
+<input type="submit" value="수정하기" />
+</div>
+</form>
+
+<br />	
+</section>
+
+<script>
+/* 생년월일 양식 */
+function separateBirthdate(id) {
+  let input = document.getElementById(id);
+  let inputValue = input.value;
+
+  // 숫자가 아닌 문자 제거
+  inputValue = inputValue.replace(/[^0-9]/g, '');
+
+  // 올바른 위치에 대시 추가
+  if (inputValue.length > 4 && inputValue.charAt(4) !== '-') {
+    inputValue = inputValue.slice(0, 4) + '-' + inputValue.slice(4);
+  }
+  if (inputValue.length > 7 && inputValue.charAt(7) !== '-') {
+    inputValue = inputValue.slice(0, 7) + '-' + inputValue.slice(7);
+  }
+
+  // 입력값 업데이트
+  input.value = inputValue;
+}
+
+/* 휴대전화 번호 양식 */
+function separatePhoneNo(id) {
+  let input = document.getElementById(id);
+  let inputValue = input.value;
+
+  // 숫자가 아닌 문자 제거
+  inputValue = inputValue.replace(/[^0-9]/g, '');
+
+  // 올바른 위치에 대시 추가
+  if (inputValue.length > 3 && inputValue.charAt(3) !== '-') {
+    inputValue = inputValue.slice(0, 3) + '-' + inputValue.slice(3);
+  }
+  if (inputValue.length > 8 && inputValue.charAt(8) !== '-') {
+    inputValue = inputValue.slice(0, 8) + '-' + inputValue.slice(8);
+  }
+
+  // 입력값 업데이트
+  input.value = inputValue;
+}
+</script>
+
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=fdd04c02ea3b2316bd88d973a73031d1&libraries=services"></script>
+<script>
+    var mapContainer = document.getElementById('map'), // 지도를 표시할 div
+        mapOption = {
+            center: new daum.maps.LatLng(37.537187, 127.005476), // 지도의 중심좌표
+            level: 3 // 지도의 확대 레벨
+        };
+
+    //지도를 미리 생성
+    var map = new daum.maps.Map(mapContainer, mapOption);
+    //주소-좌표 변환 객체를 생성
+    var geocoder = new daum.maps.services.Geocoder();
+    //마커를 미리 생성
+    var marker = new daum.maps.Marker({
+        position: new daum.maps.LatLng(37.537187, 127.005476),
+        map: map
+    });
+
+    function execDaumPostcode() {
+        new daum.Postcode({
+            oncomplete: function(data) {
+                var addr = data.address; // 최종 주소 변수
+
+                // 주소 정보를 해당 필드에 넣는다.
+                document.getElementById("address").value = addr;
+                // 주소로 상세 정보를 검색
+                geocoder.addressSearch(data.address, function(results, status) {
+                    // 정상적으로 검색이 완료됐으면
+                    if (status === daum.maps.services.Status.OK) {
+
+                        var result = results[0]; //첫번째 결과의 값을 활용
+
+                        // 해당 주소에 대한 좌표를 받아서
+                        var coords = new daum.maps.LatLng(result.y, result.x);
+                        // 지도를 보여준다.
+                        mapContainer.style.display = "block";
+                        map.relayout();
+                        // 지도 중심을 변경한다.
+                        map.setCenter(coords);
+                        // 마커를 결과값으로 받은 위치로 옮긴다.
+                        marker.setPosition(coords)
+                    }
+                });
+            }
+        }).open();
+    }
+</script>
+
+<div th:replace="~{include/bottom}"></div>

@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100..900&display=swap');
+
+table.type09 {
+  width: 800px;
+  margin: auto;
+  border-collapse: collapse;
+  text-align: left;
+  line-height: 1.5;
+}
+
+table.type09 thead th {
+  padding: 10px;
+  font-weight: bold;
+  font-size: 14px;
+  vertical-align: top;
+  color: rgb(57, 57, 57);
+  border-bottom: 3px solid rgb(57, 57, 57);
+}
+
+table.type09 tbody th {
+  padding: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  vertical-align: top;
+  border-bottom: 1px solid #ccc;
+  background: #f3f6f7;
+}
+
+table.type09 td {
+  padding: 10px;
+  vertical-align: top;
+  border-bottom: 1px solid #ccc;
+  font-size: 14px;
+}
+
+.atext {
+  text-decoration: none;
+  font-weight: 400;
+  font-size: 14px;
+  color: rgb(57, 57, 57);
+}
+
+select {
+  height: 25px;
+  width: 120px;
+  font-family: "Noto Sans KR", sans-serif;
+}

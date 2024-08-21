@@ -1,0 +1,49 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<block th:replace="~{include/top}"></block>
+	<link type="text/css" rel="stylesheet" href="/css/list.css" />
+	<link type="text/css" rel="stylesheet" href="/css/input.css" />
+</head>
+
+<section class="main">
+<br /><br /><br />
+
+<div style="display:flex;justify-content:center;margin:20px;">
+<h2>상품 등록</h2>
+</div><br />
+
+<form name="f1" method="post" enctype="multipart/form-data">
+<input type="hidden" name="gno" th:value="${gno}" />
+<table class="type09" style="width:500px;">
+	<tr><th scope="cols" style="width:150px;">골프장명</th>
+		<td th:text="'['+${usertype}+'] '+${golfcourseNm}" style="width:350px;"></td></tr>
+	<tr><th scope="cols">주소</th>
+		<td th:text="'['+${region}+'] '+${glocation}"></td></tr>
+	<tr><th scope="cols">풀홀수</th>
+		<td>[[${holeNo}]]</td></tr>
+	<tr><th scope="cols">코스홀수</th>
+		<td><input type="number" name="courseHole" style="width:30%;" /></td></tr>
+	<tr><th scope="cols">정상요금(평일)</th>
+		<td><input type="number" name="regPrice" id="regPrice" style="width:30%;" /></td></tr>
+	<tr><th scope="cols">정상요금(주말)</th>
+		<td><input type="number" name="regPrice_wknd" id="regPrice_wknd" style="width:30%;" /></td></tr>
+</table>
+
+<div style="display:flex;justify-content:center;margin:20px;">
+<input type="submit" onClick="funcU()" value="상품등록하기" />&nbsp;
+<input type="reset" value="다시입력하기" />
+</div>
+</form>
+
+<br />	
+</section>
+
+<script>
+function funcU() {
+	alert("저장완료");
+	f1.action = "/golf/product/insert";
+}
+</script>
+
+<div th:replace="~{include/bottom}"></div>

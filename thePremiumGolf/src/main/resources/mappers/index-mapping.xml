@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tinyego.index.IndexDao">
+
+<select id="list" parameterType="com.tinyego.golf.GolfVo"
+					  resultType="com.tinyego.golf.GolfVo">
+	select ROWNUM, K.* from 
+		(select rownum as rnum, P.* from
+			(select gno, golfcourseNm, golfImgStr, usertype, region, glocation, gown, totalarea, holeNo, regdate 
+			from golfT 
+			where golfImgStr is not null 
+			order by gno desc) P 
+		where ROWNUM <![CDATA[<=]]> 9) K 
+	where rnum <![CDATA[>=]]> 0
+</select>
+
+</mapper>

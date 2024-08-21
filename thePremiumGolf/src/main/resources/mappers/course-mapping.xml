@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tinyego.course.CourseDao">
+
+<select id="count" parameterType="com.tinyego.course.CourseVo"
+				  resultType="int">
+	select count(*) 
+	from courseT c join golfT g 
+	on c.gno = g.gno 
+	where 1=1 
+	<if test="searchkey != ''">
+		<if test="searchcondition == 'golfcourseNm'">
+		and golfcourseNm like #{searchkey}
+		</if>
+		<if test="searchcondition == 'courseNm'">
+		and courseNm like #{searchkey}
+		</if>
+    </if>
+</select>
+				  
+<select id="list" parameterType="com.tinyego.course.CourseVo"
+				  resultType="com.tinyego.course.CourseVo">
+	select ROWNUM, K.* from 
+	    (select rownum as rnum, P.* from
+	        (select c.cno as cno, p.pno as pno, g.gno as gno, golfcourseNm, usertype, region, glocation, holeNo, 
+	        		courseNm, c.courseHole as courseHole, regprice, regprice_wknd, c.regdate as regdate 
+			from courseT c join golfT g 
+			on c.gno = g.gno
+			join productT p 
+			on c.pno = p.pno
+	        where 1=1 
+		    <if test="searchkey != ''">
+		        <if test="searchcondition == 'golfcourseNm'">
+		        and golfcourseNm like #{searchkey}
+		        </if>
+		        <if test="searchcondition == 'courseNm'">
+		        and courseNm like #{searchkey}
+		        </if>
+	        </if>
+	        order by cno desc) P 
+	    where ROWNUM <![CDATA[<=]]> #{end}) K 
+	where rnum <![CDATA[>=]]> #{start}
+</select>
+
+<select id="guestList" parameterType="com.tinyego.course.CourseVo"
+				  resultType="com.tinyego.course.CourseVo">
+	select ROWNUM, K.* from 
+	    (select rownum as rnum, P.* from
+	        (select c.cno as cno, p.pno as pno, g.gno as gno, golfcourseNm, usertype, region, glocation, holeNo, 
+	        		courseNm, c.courseHole as courseHole, regprice, regprice_wknd, c.regdate as regdate 
+			from courseT c join golfT g 
+			on c.gno = g.gno
+			join productT p 
+			on c.pno = p.pno
+	        where usertype = '대중제' 
+	        <if test="searchkey != ''">
+		        <if test="searchcondition == 'golfcourseNm'">
+		        and golfcourseNm like #{searchkey}
+		        </if>
+		        <if test="searchcondition == 'courseNm'">
+		        and courseNm like #{searchkey}
+		        </if>
+	        </if>
+	        order by cno desc) P 
+	    where ROWNUM <![CDATA[<=]]> #{end}) K 
+	where rnum <![CDATA[>=]]> #{start}
+</select>
+
+<select id="edit" parameterType="com.tinyego.course.CourseVo"
+				  resultType="com.tinyego.course.CourseVo">
+	select cno, p.pno as pno, g.gno as gno, golfcourseNm, usertype, region, glocation, holeNo, courseNm, c.courseHole as courseHole, c.regdate as regdate 
+	from courseT c join golfT g 
+	on c.gno = g.gno 
+	join productT p 
+	on c.pno = p.pno
+	where c.cno = #{cno}
+</select>
+
+<select id="courseImgList" parameterType="com.tinyego.course.CourseVo"
+						   resultType="com.tinyego.course.CourseVo">
+	select courseImgStr 
+	from courseImgT 
+	where cno = #{cno}
+</select>
+
+<insert id="insert" parameterType="com.tinyego.course.CourseVo">
+	insert into courseT (cno, pno, gno, courseNm, courseHole) 
+	values (cidx.nextval, #{pno}, #{gno}, #{courseNm}, #{courseHole})
+</insert>
+
+<select id="selectCno">
+	select max(cno) as cno from courseT 
+</select>
+
+<insert id="insertImg">
+	insert into courseImgT (ino, cno, courseImgStr)
+	values (cImgidx.nextval, #{cno}, #{courseImgStr})
+</insert>
+
+</mapper>

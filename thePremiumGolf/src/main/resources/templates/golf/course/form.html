@@ -1,0 +1,59 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<block th:replace="~{include/top}"></block>
+	<link type="text/css" rel="stylesheet" href="/css/list.css" />
+	<link type="text/css" rel="stylesheet" href="/css/input.css" />
+</head>
+
+<section class="main">
+<br />
+
+<div style="display:flex;justify-content:center;margin:20px;">
+<h2>코스 등록</h2>
+</div>
+
+<form name="f1" action="/golf/course/insert" method="post" enctype="multipart/form-data">
+<input type="hidden" name="pno" th:value="${pno}" />
+<input type="hidden" name="gno" th:value="${gno}" />
+<table class="type09" style="width:500px;">
+	<tr><th scope="cols" style="width:165px;">골프장명</th>
+		<td th:text="'['+${m.usertype}+'] '+${m.golfcourseNm}" style="width:335px;"></td></tr>
+	<tr><th scope="cols">주소</th>
+		<td th:text="'['+${m.region}+'] '+${m.glocation}"></td></tr>
+	<tr><th scope="cols">홀수</th>
+		<td>[[${m.holeNo}]]</td></tr>
+	<tr><th scope="cols">코스명</th>
+		<td><input type="text" name="courseNm" style="width:100%;" /></td></tr>
+	<tr><th scope="cols">코스홀수</th>
+		<td><input type="number" name="courseHole" style="width:30%;" /></td></tr>
+		
+	<tr><th scope="cols" style="width:120px;">1홀 코스사진</th>
+		<td><input type="file" name="courseImg" /></td></tr>
+	<tr><th scope="cols" style="width:120px;">2홀 코스사진</th>
+		<td><input type="file" name="courseImg" /></td></tr>
+	<tr><th scope="cols" style="width:120px;">3홀 코스사진</th>
+		<td><input type="file" name="courseImg" /></td></tr>
+	<tr><th scope="cols" style="width:120px;">4홀 코스사진</th>
+		<td><input type="file" name="courseImg" /></td></tr>
+	<tr><th scope="cols" style="width:120px;">5홀 코스사진</th>
+		<td><input type="file" name="courseImg" /></td></tr>
+	<tr><th scope="cols" style="width:120px;">6홀 코스사진</th>
+		<td><input type="file" name="courseImg" /></td></tr>
+	<tr><th scope="cols" style="width:120px;">7홀 코스사진</th>
+		<td><input type="file" name="courseImg" /></td></tr>
+	<tr><th scope="cols" style="width:120px;">8홀 코스사진</th>
+		<td><input type="file" name="courseImg" /></td></tr>
+	<tr><th scope="cols" style="width:120px;">9홀 코스사진</th>
+		<td><input type="file" name="courseImg" /></td></tr>
+</table>
+
+<div style="display:flex;justify-content:center;margin:20px;">
+<input type="submit" value="코스등록하기" />
+</div>
+</form>
+
+<br />	
+</section>
+
+<div th:replace="~{include/bottom}"></div>

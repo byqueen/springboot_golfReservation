@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tinyego.member.MemberDao">
+
+<insert id="join"  parameterType="com.tinyego.member.MemberVo">
+	insert into memberT(mno, mid, mpwd, mname, mphone)
+	values(midx.nextval, #{mid}, #{mpwd}, #{mname}, #{mphone})
+</insert>
+
+<select id="login">
+	select mno, mid as username, mpwd as password, mname, role 
+	from memberT 
+	where mid=#{username}
+</select>
+
+<select id="edit" parameterType="com.tinyego.member.MemberVo"
+				  resultType="com.tinyego.member.MemberVo">
+	select mno, mid, mpwd, mname, mbirth, mphone, maddr, role, mmemo, joindate 
+	from memberT 
+	where mno=#{mno}
+</select>
+
+<update id="update" parameterType="com.tinyego.member.MemberVo">
+	update memberT set mpwd=#{mpwd}, mname=#{mname}, mbirth=#{mbirth}, mphone=#{mphone}, 
+					   maddr=#{maddr}, role=#{role}, mmemo=#{mmemo} 
+	where mno=#{mno}
+</update>
+
+<delete id="delete">
+	delete from memberT 
+	where mno=#{mno}
+</delete>
+
+<select id="list" parameterType="com.tinyego.member.MemberVo"
+				  resultType="com.tinyego.member.MemberVo">
+	select mno, mid, mpwd, mname, mbirth, mphone, maddr, role, mmemo, joindate 
+	from memberT 
+	where 1 = 1 
+	<if test="searchkey != ''">
+		<if test="searchcondition == 'mname'">
+			and mname like #{searchkey} 
+		</if>
+		<if test="searchcondition == 'mphone'">
+			and mphone like #{searchkey} 
+		</if>
+	</if>
+	order by mno desc 
+	offset #{start} row 
+	fetch next #{pageSize} rows only
+</select>
+
+<select id="count" parameterType="com.tinyego.member.MemberVo"
+				   resultType="int">
+	select count(*) as totalRecord 
+	from memberT 
+	where 1 = 1 
+	<if test="searchkey != ''">
+		<if test="searchcondition == 'mname'">
+			and mname like #{searchkey} 
+		</if>
+		<if test="searchcondition == 'mphone'">
+			and mphone like #{searchkey} 
+		</if>
+	</if>
+</select>
+
+</mapper>

@@ -1,0 +1,123 @@
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<block th:replace="~{include/top}"></block>
+	<link type="text/css" rel="stylesheet" href="/css/login.css" />
+</head>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+	$("#click-signup").click(function() {
+		$(".signup-wrapper").addClass('active');
+		$(".signin-wrapper").removeClass('active');
+		$(".signin-wrapper").addClass('inactive');
+		$(".signup-wrapper").removeClass('inactive');
+	});
+
+	$("#click-signin").click(function() {
+		$(".signin-wrapper").addClass('active');
+		$(".signup-wrapper").removeClass('active');
+		$(".signup-wrapper").addClass('inactive');
+		$(".signin-wrapper").removeClass('inactive');
+	});
+	
+	$("#mobile").click(function() {
+		$(".root").addClass('mobile-root');
+	});
+	
+	$("#desk").click(function() {
+		$(".root").removeClass('mobile-root');
+	});
+});
+</script>
+
+<section class="main">
+<br />
+
+<div class="root">
+<div class="signin-wrapper form active">
+	<div class="form-wrapper">
+	<h2>Sign in</h2>
+		<form name="loginF" method="post">
+		<input type="text" name="username" placeholder="아이디" class="form-field"></input>
+		<input type="password" name="password" placeholder="비밀번호" class="form-field"></input>
+		<button type="submit" class="button primary">로그인하기</button>
+		</form>
+		<button class="button secondary" id="click-signup">회원가입하기</button>
+	</div>
+</div>
+
+<div class="signup-wrapper form inactive">
+	<div class="form-wrapper">
+	<h2>Sign up</h2>
+		<form name="joinF" method="post" 
+			  action="/member/join" onSubmit="return submitJoinForm();">
+		<input type="text" name="mid" placeholder="아이디" class="form-field"></input>
+		<input type="password" name="mpwd" placeholder="비밀번호" class="form-field"></input>
+		<input type="text" name="mname" placeholder="성함" class="form-field"></input>
+		<input type="text" id="mphone" name="mphone" 
+			   onkeyup="separatePhoneNo(this.id)" maxlength="13" 
+			   placeholder="휴대폰번호" class="form-field"></input>
+		<button class="button primary" onClick="submitForm2()">회원가입하기</button>
+		</form>
+		<button type="button" class="button secondary" id="click-signin">로그인하기</button>
+	</div>
+</div>
+</div>
+
+<br />	
+</section>
+
+<script>
+/* 휴대전화 번호 양식 */
+function separatePhoneNo(id) {
+  let input = document.getElementById(id);
+  let inputValue = input.value;
+ 
+  inputValue = inputValue.replace(/[^0-9]/g, ''); // 숫자가 아닌 문자 제거 
+  if (inputValue.length > 3 && inputValue.charAt(3) !== '-') { // 올바른 위치에 대시 추가
+    inputValue = inputValue.slice(0, 3) + '-' + inputValue.slice(3);
+  }
+  if (inputValue.length > 8 && inputValue.charAt(8) !== '-') {
+    inputValue = inputValue.slice(0, 8) + '-' + inputValue.slice(8);
+  }
+  input.value = inputValue; // 입력값 업데이트
+}
+
+function submitLoginForm() {
+	var username = loginF.username.value;
+	var password = loginF.password.value;
+	if (username === "") { alert ("아이디를 입력해주세요")
+	} else if (password === "") { alert ("비밀번호를 입력해주세요") 
+	}
+}
+
+function submitJoinForm() {
+	var mid = joinF.mid.value;
+	var mpwd = joinF.mpwd.value;
+	var mname = joinF.mname.value;
+	var mphone = joinF.mphone.value;
+	
+	if (mid === "") {
+		alert ("아이디를 입력해주세요")
+		joinF.mid.focus();
+		return false;
+	} else if (mpwd === "") {
+		alert ("비밀번호를 입력해주세요")
+		joinF.mpwd.focus();
+		return false;
+	} else if (mname === "") {
+		alert ("성함을 입력해주세요")
+		joinF.mname.focus();
+		return false;
+	} else if (mphone === "") {
+		alert ("휴대폰번호를 입력해주세요")
+		joinF.mphone.focus();
+		return false;
+	}
+	alert ("회원가입완료");
+}
+</script>
+
+<div th:replace="~{include/bottom}"></div>
