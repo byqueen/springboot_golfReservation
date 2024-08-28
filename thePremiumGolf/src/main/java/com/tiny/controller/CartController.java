@@ -48,14 +48,14 @@ public class CartController {
 		Map<String, String> response = new HashMap<>();
 	    String username = principal.getName();
 		vo.setMid(username);
-	    List<CartVo> m = cartService.edit(vo);
-	    if (m != null) {
+	    List<CartVo> li = cartService.edit(vo);
+	    if (!li.isEmpty()) {
 	        response.put("alertMessage", "장바구니에 담긴 상품이 존재합니다");
 	    } else {
 			cartService.insert(vo);
 	        response.put("alertMessage", "장바구니에서 예약을 완료해주세요");
 	    }
-	    response.put("redirectUrl", "/golf/course/edit?");
+	    response.put("redirectUrl", "/golf/cart/edit");
 	    return ResponseEntity.ok()
 	            .contentType(MediaType.APPLICATION_JSON) // Content-Type 설정
 	            .body(response);
@@ -69,8 +69,8 @@ public class CartController {
 	    Map<String, String> response = new HashMap<>();
 	    String username = principal.getName();
 		vo.setMid(username);
-	    List<CartVo> m = cartService.edit(vo);
-	    if (m != null) {
+	    List<CartVo> li = cartService.edit(vo);
+	    if (!li.isEmpty()) {
 	        response.put("alertMessage", "장바구니에 담긴 상품이 존재합니다");
 	        response.put("redirectUrl", "/golf/course/edit?cno=" + cno);
 	    } else {
@@ -151,7 +151,9 @@ public class CartController {
     }
     
     @GetMapping("/delete")
-    public String delete(CartVo vo) {
+    public String delete(@AuthenticationPrincipal SecurityUser principal, CartVo vo) {
+    	String username = principal.getUsername();
+		vo.setMid(username);
     	cartService.delete(vo);
     	return "redirect:/golf/course/list"; 
     }

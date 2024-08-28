@@ -10,12 +10,11 @@
 <section class="main">
 <br /><br />
 
-<div th:if="${li == null}" style="width:600px;margin:180px;display:flex;justify-content:center;align-items:center;height:20vh;">
+<div th:if="${li.isEmpty()}" style="width:600px;margin:180px;display:flex;justify-content:center;align-items:center;height:20vh;">
     <h5>장바구니에 담긴 상품이 없습니다.</h5>
 </div>
 
-<div th:if="${li != null}"
-	th:each="m : ${li}" 
+<div th:if="${!li.isEmpty()}"
 	style="width:600px;margin:auto;">
 <h5 align="left">
 &emsp;*(1인 기준) 기본 18홀 라운딩 요금입니다.<br />
@@ -29,7 +28,8 @@
 </select>
 </h5>
 
-<form name="cartF" method="post">
+<form name="cartF" method="post"
+	  th:each="m : ${li.subList(0,1)}" >
 <input type="hidden" id="mid" name="mid" th:value="${username}" />
 <input type="hidden" id="role" name="role" th:value="${role}" />
 <input type="hidden" id="mname" name="mname" th:value="${m.mname}" />

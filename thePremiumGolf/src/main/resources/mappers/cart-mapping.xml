@@ -20,7 +20,7 @@ select ctno, m.mid as mid, mname, mphone, ct.gno as gno, ct.cno as cno, golfcour
 
 <delete id="delete" parameterType="com.tinyego.cart.CartVo">
 	delete from cartT 
-	where ctno=#{ctno}
+	where mid=#{mid}
 </delete>
 
 </mapper>
