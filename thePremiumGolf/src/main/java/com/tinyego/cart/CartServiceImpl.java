@@ -1,5 +1,7 @@
 package com.tinyego.cart;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +20,7 @@ public class CartServiceImpl implements CartService {
 	}
 
 	@Override
-	public CartVo edit(CartVo vo) {
+	public List<CartVo> edit(CartVo vo) {
 		return dao.edit(vo);
 	}
 

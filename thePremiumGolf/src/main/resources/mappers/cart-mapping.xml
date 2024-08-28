@@ -9,7 +9,7 @@
 
 <select id="edit" parameterType="com.tinyego.cart.CartVo"
 					 resultType="com.tinyego.cart.CartVo">
-	select ctno, m.mid as mid, mname, mphone, ct.gno as gno, ct.cno as cno, golfcourseNm, courseNm, c.courseHole as courseHole, regPrice, regPrice_wknd, amount, rpeople, ct.regdate as regdate 
+select ctno, m.mid as mid, mname, mphone, ct.gno as gno, ct.cno as cno, golfcourseNm, courseNm, c.courseHole as courseHole, regPrice, regPrice_wknd, amount, rpeople, ct.regdate as regdate 
 	from cartT ct join ProductT p
 	on ct.gno = p.gno join courseT c 
 	on ct.cno = c.cno join golfT g

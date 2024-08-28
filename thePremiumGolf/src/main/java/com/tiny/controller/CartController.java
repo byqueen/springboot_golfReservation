@@ -16,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -39,12 +40,36 @@ public class CartController {
 	
 	@PostMapping("/insert")
 	@ResponseBody
+	public ResponseEntity<Map<String, String>> insertCart(
+			@RequestParam(value="cno") String cno, 
+			Principal principal, CartVo vo) {
+		System.out.println("===> cart insert vo : " + vo);
+		
+		Map<String, String> response = new HashMap<>();
+	    String username = principal.getName();
+		vo.setMid(username);
+	    List<CartVo> m = cartService.edit(vo);
+	    if (m != null) {
+	        response.put("alertMessage", "장바구니에 담긴 상품이 존재합니다");
+	    } else {
+			cartService.insert(vo);
+	        response.put("alertMessage", "장바구니에서 예약을 완료해주세요");
+	    }
+	    response.put("redirectUrl", "/golf/course/edit?");
+	    return ResponseEntity.ok()
+	            .contentType(MediaType.APPLICATION_JSON) // Content-Type 설정
+	            .body(response);
+	}
+	
+	/*
+	@PostMapping("/insert")
+	@ResponseBody
 	public ResponseEntity<Map<String, String>> insertCart(@RequestParam(value="cno") String cno, 
 														  Principal principal, CartVo vo) {
 	    Map<String, String> response = new HashMap<>();
 	    String username = principal.getName();
 		vo.setMid(username);
-	    CartVo m = cartService.edit(vo);
+	    List<CartVo> m = cartService.edit(vo);
 	    if (m != null) {
 	        response.put("alertMessage", "장바구니에 담긴 상품이 존재합니다");
 	        response.put("redirectUrl", "/golf/course/edit?cno=" + cno);
@@ -67,10 +92,12 @@ public class CartController {
 		cartService.insert(vo);
 		return "redirect:/golf/cart/edit";
 	}
+	*/
 	
 	@GetMapping("/edit")
 	public String editReserv(@AuthenticationPrincipal SecurityUser principal, 
 			Model model, CartVo vo) {
+		System.out.println("===> cart edit ");
 		String username = principal.getUsername();
 		vo.setMid(username);
 		
@@ -80,7 +107,7 @@ public class CartController {
 		
 		model.addAttribute("username", username);
 		model.addAttribute("role", role);
-	    model.addAttribute("m", cartService.edit(vo));
+	    model.addAttribute("li", cartService.edit(vo));
 	    return "/golf/cart/list";
 	}
 

@@ -10,11 +10,13 @@
 <section class="main">
 <br /><br />
 
-<div th:if="${m == null}" style="width:600px;margin:180px;display:flex;justify-content:center;align-items:center;height:20vh;">
+<div th:if="${li == null}" style="width:600px;margin:180px;display:flex;justify-content:center;align-items:center;height:20vh;">
     <h5>장바구니에 담긴 상품이 없습니다.</h5>
 </div>
 
-<div th:if="${m != null}" style="width:600px;margin:auto;">
+<div th:if="${li != null}"
+	th:each="m : ${li}" 
+	style="width:600px;margin:auto;">
 <h5 align="left">
 &emsp;*(1인 기준) 기본 18홀 라운딩 요금입니다.<br />
 &emsp;아래에서 라운딩하실 날짜와 시간을 선택하시면 총 요금이 계산되어 보여집니다.<br /><br />
